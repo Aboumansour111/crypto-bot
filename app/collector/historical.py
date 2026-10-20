@@ -73,10 +73,17 @@ def collect_history(
 
             market_id = market["id"]
 
+            safe_cutoff = int(
+                datetime.now(timezone.utc).timestamp()
+            ) - 60
+
             for bar in bars:
                 ts = int(bar["ts"])
 
                 if ts < start_ts or ts > end_ts:
+                    continue
+
+                if ts + interval > safe_cutoff:
                     continue
 
                 conn.execute(
