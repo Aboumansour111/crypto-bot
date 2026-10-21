@@ -133,6 +133,12 @@ def collect_history(
         next_cursor = last_ts + interval
 
         if next_cursor <= cursor:
+            # The API may omit the still-forming candle and return
+            # only the previous completed candle. Stop cleanly only
+            # when the current cursor's candle has not completed yet.
+            if cursor + interval > safe_cutoff:
+                break
+
             raise RuntimeError(
                 f"Collector cursor did not advance: "
                 f"{symbol} {resolution} cursor={cursor}"
